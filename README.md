@@ -38,7 +38,7 @@ SocketGames/
 
 1. 启动服务器：
    ```bash
-   python server/server.py
+   python app.py
    ```
 2. 访问游戏：
    - 本机访问：http://localhost:8080
