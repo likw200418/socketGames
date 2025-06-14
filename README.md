@@ -58,4 +58,69 @@ SocketGames/
 - [ ] 五子棋游戏
 - [ ] 更多游戏支持
 - [ ] 游戏回放功能
-- [ ] 排行榜系统 
+- [ ] 排行榜系统
+
+## 功能特点
+
+- 多人在线对战
+- 实时聊天
+- 房间系统
+- 支持多种游戏（开发中）
+
+## 游戏列表
+
+1. 井字棋（已实现）
+2. 五子棋（开发中）
+3. 贪吃蛇（开发中）
+
+## 界面预览
+
+![游戏界面](docs/images/游戏截图.png)
+![游戏界面](docs/images/游戏截图2.png)
+
+
+## 安装说明
+
+1. 克隆仓库：
+```bash
+git clone https://github.com/yourusername/SocketGames.git
+cd SocketGames
+```
+
+2. 安装依赖：
+```bash
+pip install -r requirements.txt
+```
+
+3. 运行服务器：
+```bash
+python app.py
+```
+
+4. 在浏览器中访问：
+```
+http://localhost:8080
+```
+
+## 技术栈
+
+- 后端：Python + WebSocket
+- 前端：HTML + CSS + JavaScript
+
+## 开发计划
+
+- [x] 用户系统
+- [x] 房间系统
+- [x] 井字棋游戏
+- [ ] 五子棋游戏
+- [ ] 贪吃蛇游戏
+- [ ] 排行榜系统
+- [ ] 好友系统
+
+## 贡献指南
+
+欢迎提交Issue和Pull Request！
+
+## 许可证
+
+MIT License 
