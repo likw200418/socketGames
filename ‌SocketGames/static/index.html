@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>井字棋</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        .game-container, .login-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin: 20px;
+        }
+
+        .status {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .cell {
+            width: 80px;
+            height: 80px;
+            background-color: #fff;
+            border: 2px solid #333;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .cell:hover {
+            background-color: #f5f5f5;
+        }
+
+        .cell.x {
+            color: #e74c3c;
+        }
+
+        .cell.o {
+            color: #3498db;
+        }
+
+        @media (max-width: 400px) {
+            .cell {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5em;
+            }
+        }
+
+        .restart-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .restart-btn:hover {
+            background-color: #45a049;
+        }
+
+        .leave-btn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .leave-btn:hover {
+            background-color: #da190b;
+        }
+
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin: 20px;
+            width: 300px;
+        }
+
+        .login-container input {
+            margin: 8px 0;
+            padding: 8px;
+            font-size: 1em;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 180px;
+        }
+
+        .login-btn {
+            padding: 8px 20px;
+            font-size: 1em;
+            background: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .login-btn:hover {
+            background: #217dbb;
+        }
+
+        .login-msg {
+            color: #e74c3c;
+            margin-bottom: 10px;
+            min-height: 1.2em;
+        }
+
+        .rooms-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin: 20px;
+            width: 300px;
+        }
+
+        .room-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .room-item {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .room-item:hover {
+            background-color: #e9ecef;
+        }
+
+        .room-item.full {
+            background-color: #f8d7da;
+            cursor: not-allowed;
+        }
+
+        .create-room-btn {
+            padding: 8px 20px;
+            font-size: 1em;
+            background: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .create-room-btn:hover {
+            background: #218838;
+        }
+
+        .register-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .register-btn {
+            padding: 8px 20px;
+            font-size: 1em;
+            background: #6c757d;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .register-btn:hover {
+            background: #5a6268;
+        }
+
+        .register-msg {
+            color: #e74c3c;
+            margin-bottom: 10px;
+            min-height: 1.2em;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .game-select-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 400px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .game-select-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .game-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            width: 100%;
+        }
+
+        .game-button {
+            padding: 15px;
+            font-size: 18px;
+            background: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-align: center;
+        }
+
+        .game-button:hover {
+            background: #2980b9;
+        }
+
+        .game-button.disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .game-button.disabled:hover {
+            background: #95a5a6;
+        }
+
+        .back-btn {
+            padding: 8px 20px;
+            font-size: 1em;
+            background: #6c757d;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+        }
+
+        .game-container {
+            display: flex;
+            gap: 20px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin: 20px;
+        }
+
+        .game-board {
+            flex: 1;
+        }
+
+        .chat-container {
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            background: #f8f9fa;
+        }
+
+        .chat-input-container {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            background: white;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+
+        .chat-send {
+            padding: 8px 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .chat-send:hover {
+            background: #2980b9;
+        }
+
+        .chat-message {
+            margin: 5px 0;
+            padding: 8px 12px;
+            border-radius: 15px;
+            background: white;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .chat-message.system {
+            color: #666;
+            font-style: italic;
+            text-align: center;
+            background: #f8f9fa;
+            margin: 10px auto;
+            max-width: 90%;
+        }
+
+        .chat-message.self {
+            margin-left: auto;
+            background: #3498db;
+            color: white;
+        }
+
+        .chat-message.other {
+            margin-right: auto;
+            background: #e9ecef;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div id="loginContainer" class="login-container">
+        <h2>登录</h2>
+        <div class="login-msg"></div>
+        <input type="text" id="loginUsername" placeholder="用户名">
+        <input type="password" id="loginPassword" placeholder="密码">
+        <button class="login-btn" onclick="login()">登录</button>
+        <button class="register-btn" onclick="showRegister()">注册新用户</button>
+    </div>
+
+    <div id="registerContainer" class="register-container hidden">
+        <h2>注册</h2>
+        <div class="register-msg"></div>
+        <input type="text" id="registerUsername" placeholder="用户名">
+        <input type="password" id="registerPassword" placeholder="密码">
+        <button class="register-btn" onclick="register()">注册</button>
+        <button class="login-btn" onclick="showLogin()">返回登录</button>
+    </div>
+
+    <div id="gameSelectContainer" class="game-select-container hidden">
+        <h2 class="game-select-title">选择游戏</h2>
+        <div class="game-buttons">
+            <button class="game-button" onclick="selectGame('tictactoe')">井字棋</button>
+            <button class="game-button disabled" onclick="selectGame('gomoku')">五子棋</button>
+            <button class="game-button disabled" onclick="selectGame('snake')">贪吃蛇</button>
+        </div>
+    </div>
+
+    <div id="roomsContainer" class="rooms-container hidden">
+        <h2>房间列表</h2>
+        <ul id="roomList" class="room-list"></ul>
+        <button class="create-room-btn" onclick="createRoom()">创建新房间</button>
+        <button class="back-btn" onclick="backToGameSelect()">返回游戏选择</button>
+    </div>
+
+    <div id="gameContainer" class="game-container hidden">
+        <div class="game-board">
+            <div class="status" id="status">等待对手加入...</div>
+            <div class="board" id="board"></div>
+            <button class="restart-btn" onclick="restartGame()">重新开始</button>
+            <button class="leave-btn" onclick="leaveRoom()">退出房间</button>
+            <button class="back-btn" onclick="backToGameSelect()">返回游戏选择</button>
+        </div>
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="chatInput" placeholder="输入消息..." onkeypress="handleChatKeyPress(event)">
+                <button class="chat-send" onclick="sendChatMessage()">发送</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let currentPlayer = null;
+        let currentRoom = null;
+        let gameStarted = false;
+        let gameOver = false;
+        let currentUsername = '';
+
+        function connect() {
+            ws = new WebSocket('ws://' + window.location.hostname + ':8765');
+            
+            ws.onopen = () => {
+                console.log('WebSocket连接已建立');
+            };
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                console.log('收到消息:', data);
+                
+                switch(data.type) {
+                    case 'login_result':
+                        handleLoginResult(data);
+                        break;
+                    case 'register_result':
+                        handleRegisterResult(data);
+                        break;
+                    case 'rooms_info':
+                        updateRoomList(data.rooms);
+                        break;
+                    case 'join_result':
+                        handleJoinResult(data);
+                        break;
+                    case 'game_state':
+                        updateGameState(data);
+                        break;
+                    case 'game_over':
+                        handleGameOver(data);
+                        break;
+                    case 'error':
+                        showError(data.msg);
+                        break;
+                    case 'chat':
+                        addChatMessage(data.message);
+                        break;
+                }
+            };
+            
+            ws.onclose = () => {
+                console.log('WebSocket连接已关闭');
+                setTimeout(connect, 1000);
+            };
+        }
+
+        function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!username || !password) {
+                showLoginError('请输入用户名和密码');
+                return;
+            }
+            
+            ws.send(JSON.stringify({
+                type: 'login',
+                username: username,
+                password: password
+            }));
+        }
+
+        function register() {
+            const username = document.getElementById('registerUsername').value;
+            const password = document.getElementById('registerPassword').value;
+            
+            if (!username || !password) {
+                showRegisterError('请输入用户名和密码');
+                return;
+            }
+            
+            ws.send(JSON.stringify({
+                type: 'register',
+                username: username,
+                password: password
+            }));
+        }
+
+        function handleLoginResult(data) {
+            if (data.success) {
+                currentUsername = document.getElementById('loginUsername').value;
+                document.getElementById('loginContainer').classList.add('hidden');
+                document.getElementById('registerContainer').classList.add('hidden');
+                document.getElementById('gameSelectContainer').classList.remove('hidden');
+                // 获取房间列表
+                ws.send(JSON.stringify({
+                    type: 'get_rooms'
+                }));
+            } else {
+                showLoginError(data.msg);
+            }
+        }
+
+        function handleRegisterResult(data) {
+            if (data.success) {
+                showRegisterSuccess('注册成功，请登录');
+                showLogin();
+            } else {
+                showRegisterError(data.msg);
+            }
+        }
+
+        function showLoginError(msg) {
+            const msgDiv = document.querySelector('.login-msg');
+            msgDiv.textContent = msg;
+        }
+
+        function showRegisterError(msg) {
+            const msgDiv = document.querySelector('.register-msg');
+            msgDiv.textContent = msg;
+        }
+
+        function showRegisterSuccess(msg) {
+            const msgDiv = document.querySelector('.register-msg');
+            msgDiv.textContent = msg;
+            msgDiv.style.color = '#28a745';
+        }
+
+        function showLogin() {
+            document.getElementById('registerContainer').classList.add('hidden');
+            document.getElementById('loginContainer').classList.remove('hidden');
+        }
+
+        function showRegister() {
+            document.getElementById('loginContainer').classList.add('hidden');
+            document.getElementById('registerContainer').classList.remove('hidden');
+        }
+
+        function updateRoomList(rooms) {
+            const roomList = document.getElementById('roomList');
+            roomList.innerHTML = '';
+            
+            if (rooms && rooms.length > 0) {
+                rooms.forEach(room => {
+                    const li = document.createElement('li');
+                    li.className = 'room-item';
+                    if (room.player_count >= 2) {
+                        li.classList.add('full');
+                    }
+                    li.textContent = `房间${room.room_id} (${room.player_count}/2)`;
+                    if (room.player_count < 2) {
+                        li.onclick = () => joinRoom(room.room_id);
+                    }
+                    roomList.appendChild(li);
+                });
+            } else {
+                const li = document.createElement('li');
+                li.className = 'room-item';
+                li.textContent = '暂无房间';
+                roomList.appendChild(li);
+            }
+        }
+
+        function createRoom() {
+            ws.send(JSON.stringify({
+                type: 'join_room',
+                room_id: 0
+            }));
+        }
+
+        function joinRoom(roomId) {
+            ws.send(JSON.stringify({
+                type: 'join_room',
+                room_id: roomId
+            }));
+        }
+
+        function handleJoinResult(data) {
+            if (data.success) {
+                currentPlayer = data.player_id;
+                currentRoom = data.room_id;
+                document.getElementById('roomsContainer').classList.add('hidden');
+                document.getElementById('gameContainer').classList.remove('hidden');
+                document.getElementById('status').textContent = data.msg;
+                // 清空聊天记录
+                document.getElementById('chatMessages').innerHTML = '';
+                addChatMessage('你已加入房间', true);
+                // 自动聚焦到聊天输入框
+                document.getElementById('chatInput').focus();
+            } else {
+                showError(data.msg);
+            }
+        }
+
+        function updateGameState(data) {
+            if (data.room_id !== currentRoom) return;
+            
+            gameStarted = data.game_started;
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+            
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    if (data.board[i][j] === 'X') {
+                        cell.textContent = 'X';
+                        cell.classList.add('x');
+                    } else if (data.board[i][j] === 'O') {
+                        cell.textContent = 'O';
+                        cell.classList.add('o');
+                    }
+                    if (gameStarted && !gameOver && data.current_player === currentPlayer) {
+                        cell.onclick = () => makeMove(i, j);
+                    }
+                    board.appendChild(cell);
+                }
+            }
+            
+            const status = document.getElementById('status');
+            if (gameStarted) {
+                if (data.current_player === currentPlayer) {
+                    status.textContent = '轮到你了';
+                } else {
+                    status.textContent = '等待对手...';
+                }
+            } else {
+                status.textContent = '等待对手加入...';
+            }
+        }
+
+        function makeMove(row, col) {
+            if (!gameStarted || gameOver) return;
+            
+            ws.send(JSON.stringify({
+                type: 'move',
+                position: [row, col]
+            }));
+        }
+
+        function handleGameOver(data) {
+            if (data.room_id !== currentRoom) return;
+            
+            gameOver = true;
+            const status = document.getElementById('status');
+            if (data.winner === 'D') {
+                status.textContent = '平局！';
+                addChatMessage('游戏结束：平局！', true);
+            } else {
+                const winner = data.winner === 'X' ? '玩家1' : '玩家2';
+                status.textContent = `${winner}获胜！`;
+                addChatMessage(`游戏结束：${winner}获胜！`, true);
+            }
+        }
+
+        function restartGame() {
+            if (!gameStarted) return;
+            
+            ws.send(JSON.stringify({
+                type: 'restart'
+            }));
+            gameOver = false;
+        }
+
+        function leaveRoom() {
+            ws.send(JSON.stringify({
+                type: 'leave_room'
+            }));
+            document.getElementById('gameContainer').classList.add('hidden');
+            document.getElementById('roomsContainer').classList.remove('hidden');
+            currentPlayer = null;
+            currentRoom = null;
+            gameStarted = false;
+            gameOver = false;
+        }
+
+        function showError(msg) {
+            alert(msg);
+        }
+
+        function selectGame(gameType) {
+            if (gameType === 'tictactoe') {
+                document.getElementById('gameSelectContainer').classList.add('hidden');
+                document.getElementById('roomsContainer').classList.remove('hidden');
+            } else {
+                alert('该游戏正在开发中...');
+            }
+        }
+
+        function backToGameSelect() {
+            // 如果当前在游戏中，先退出房间
+            if (currentRoom !== null) {
+                leaveRoom();
+            }
+            // 隐藏当前界面
+            document.getElementById('roomsContainer').classList.add('hidden');
+            document.getElementById('gameContainer').classList.add('hidden');
+            // 显示游戏选择界面
+            document.getElementById('gameSelectContainer').classList.remove('hidden');
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message && currentRoom !== null) {
+                ws.send(JSON.stringify({
+                    type: 'chat',
+                    message: message
+                }));
+                input.value = '';
+                // 清空输入框后自动聚焦
+                input.focus();
+            }
+        }
+
+        function addChatMessage(message, isSystem = false) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${isSystem ? 'system' : ''}`;
+            
+            if (!isSystem) {
+                // 检查是否是当前用户发送的消息
+                const isSelf = message.startsWith(currentUsername + ':');
+                messageDiv.classList.add(isSelf ? 'self' : 'other');
+            }
+            
+            messageDiv.textContent = message;
+            chatMessages.appendChild(messageDiv);
+            // 确保滚动到最新消息
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // 页面加载完成后连接WebSocket
+        window.onload = connect;
+    </script>
+</body>
+</html> 
